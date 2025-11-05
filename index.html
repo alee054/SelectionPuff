@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Selection Puff – Vetrina</title>
+  <meta name="description" content="Selection Puff: vetrina di puff monouso dai mix fruttati e ghiacciati, carrello e checkout via WhatsApp.">
+
+  <style>
+    :root{
+      --bg:#f6f8ff; --bg-2:#eaf0ff; --card:#ffffff; --surface:#eef3ff;
+      --muted:#4a5a7a; --text:#0b1220; --accent:#0066ff; --accent-2:#00b7ff;
+      --edge: rgba(8,14,30,.12); --radius:16px; --shadow: 0 10px 30px rgba(10, 20, 60, .08);
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;padding:0;min-height:100%;
+      background:
+        radial-gradient(800px 400px at 10% -10%,rgba(0,183,255,.15),transparent 50%),
+        radial-gradient(900px 450px at 90% -10%,rgba(0,102,255,.12),transparent 50%),
+        linear-gradient(180deg,var(--bg),var(--bg-2));
+      color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+    }
+    a{color:inherit;text-decoration:none}
+    @keyframes floatIn{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+    @keyframes pulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
+
+    /* HEADER */
+    header{position:sticky;top:0;backdrop-filter:saturate(1.2) blur(12px);background:rgba(255,255,255,.7);border-bottom:1px solid var(--edge);z-index:20}
+    .wrap{max-width:1180px;margin:0 auto;padding:16px}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .dot{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#56b0ff,#7e88ff);animation:pulse 4s ease-in-out infinite}
+    .cartBtn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:1px solid var(--edge);background:linear-gradient(90deg,rgba(0,102,255,.08),rgba(0,183,255,.10));cursor:pointer;transition:transform .15s ease, box-shadow .2s ease;font-weight:800}
+    .cartBtn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+    .badge{min-width:22px;height:22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff}
+
+    /* GRID */
+    main{padding:24px 0 32px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+    .card{background:var(--card);border:1px solid var(--edge);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:transform .18s ease, box-shadow .2s ease, border-color .2s ease;animation:floatIn .35s ease both;box-shadow:var(--shadow)}
+    .card:hover{transform:translateY(-3px);box-shadow:0 14px 40px rgba(10,20,60,.12);border-color:rgba(8,14,30,.2)}
+    .thumb{width:100%;aspect-ratio:9/7;object-fit:cover;background:#e5ecff;display:block}
+    .body{padding:14px 14px 16px;background:linear-gradient(180deg,var(--surface),transparent 40%)}
+    .title{font-weight:900;line-height:1.25;margin:0 0 8px;font-size:16px;min-height:40px}
+    .desc{color:var(--muted);font-size:14px;line-height:1.45;min-height:42px}
+
+    /* RIGA PREZZO + AZIONI: ora in colonna e centrati */
+    .rowc{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:12px}
+    .price{font-weight:900;font-size:18px;background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center}
+    .actions{display:flex;align-items:center;justify-content:center;gap:10px}
+    .cta{font-weight:800;padding:10px 12px;border-radius:12px;border:1px solid var(--edge);cursor:pointer}
+    .cta.ghost{background:#fff;color:#0c1226;border:1px solid rgba(12,18,38,.12)}
+    .add{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0}
+
+    /* FOOTER */
+    footer{color:var(--muted);text-align:center;padding:24px;border-top:1px solid var(--edge)}
+
+    /* CART DRAWER (stub: non usato qui ma lasciato) */
+    .drawer{position:fixed;top:0;right:-460px;width:460px;max-width:92vw;height:100vh;background:#fff;border-left:1px solid var(--edge);z-index:30;display:flex;flex-direction:column;transition:right .25s ease;box-shadow:-12px 0 30px rgba(10,20,60,.12);color:var(--text)}
+    .drawer.open{right:0}
+    .dhead{padding:16px;border-bottom:1px solid var(--edge);display:flex;justify-content:space-between;align-items:center;background:var(--surface)}
+    .dtitle{font-weight:900;font-size:18px}
+    .dcontent{padding:14px;overflow:auto;flex:1}
+    .dfoot{padding:14px;border-top:1px solid var(--edge);background:var(--surface)}
+    .total{display:flex;justify-content:space-between;font-weight:900;margin-bottom:12px;font-size:18px}
+    .checkout{width:100%;padding:14px 16px;border-radius:14px;border:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:900;cursor:pointer;font-size:16px}
+    /* Header brand – testo in grassetto */
+.brand{
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  font-weight:800;   /* <-- rende "Selection Puff" bold */
+  
+  <a class="brand" href="index.html">
+  <span class="dot"></span> <strong>Selection Puff</strong>
+</a>
+
+}
+
+
+    @media (max-width:900px){
+      .grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+    }
+  </style>
+</head>
+<body>
+<header class="uni-header">
+  <div class="wrap row">
+    <a class="brand" href="index.html"><span class="dot"></span> Selection Puff</a>
+    <button class="cartBtn" id="cartBtn"><span>Carrello</span> <span class="badge" id="cartCount">0</span></button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="grid" id="grid">
+    <!-- p1 -->
+    <div class="card" data-product="p1">
+      <a href="product.html?id=p1"><img class="thumb" alt="Grape Ice + Mango Peach + Blueberry Watermelon" src="grapeice1.jpg"></a>
+      <div class="body">
+        <h2 class="title">Grape Ice + Mango Peach + Blueberry Watermelon</h2>
+        <p class="desc">Uva ghiacciata con mango e pesca, rifinito da mirtillo e anguria • 💨 110K tiri</p>
+        <div class="rowc">
+          <span class="price">€20</span>
+          <div class="actions">
+            <a class="cta ghost" href="product.html?id=p1">Dettagli</a>
+            <button class="cta add" data-add="p1" data-name="Grape Ice + Mango Peach + Blueberry Watermelon" data-price="20">Aggiungi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- p2 -->
+    <div class="card" data-product="p2">
+      <a href="product.html?id=p2"><img class="thumb" alt="Strawberry Ice + Peach Lemon + Kiwi Passion Fruit Guava" src="strawberry1.jpg"></a>
+      <div class="body">
+        <h2 class="title">Strawberry Ice + Peach Lemon + Kiwi Passion Fruit Guava</h2>
+        <p class="desc">Fragola ghiacciata, pesca e limone con note tropicali di kiwi, maracuja e guava • 💨 110K tiri</p>
+        <div class="rowc">
+          <span class="price">€20</span>
+          <div class="actions">
+            <a class="cta ghost" href="product.html?id=p2">Dettagli</a>
+            <button class="cta add" data-add="p2" data-name="Strawberry Ice + Peach Lemon + Kiwi Passion Fruit Guava" data-price="20">Aggiungi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- p3 -->
+    <div class="card" data-product="p3">
+      <a href="product.html?id=p3"><img class="thumb" alt="Strawberry Kiwi + Blueberry Coconut + Mixed Berry" src="blueberrycoconut1.jpg"></a>
+      <div class="body">
+        <h2 class="title">Strawberry Kiwi + Blueberry Coconut + Mixed Berry</h2>
+        <p class="desc">Fragola e kiwi incontrano cocco cremoso e un ricco mix di frutti di bosco • 💨 110K tiri</p>
+        <div class="rowc">
+          <span class="price">€20</span>
+          <div class="actions">
+            <a class="cta ghost" href="product.html?id=p3">Dettagli</a>
+            <button class="cta add" data-add="p3" data-name="Strawberry Kiwi + Blueberry Coconut + Mixed Berry" data-price="20">Aggiungi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- p4 -->
+    <div class="card" data-product="p4">
+      <a href="product.html?id=p4"><img class="thumb" alt="Fuji Ice + Grape Ice + Cherry Pomegranate" src="fujii1.jpg"></a>
+      <div class="body">
+        <h2 class="title">Fuji Ice + Grape Ice + Cherry Pomegranate</h2>
+        <p class="desc">Mela Fuji croccante e uva ghiacciata, con un finale di ciliegia e melograno • 💨 110K tiri</p>
+        <div class="rowc">
+          <span class="price">€20</span>
+          <div class="actions">
+            <a class="cta ghost" href="product.html?id=p4">Dettagli</a>
+            <button class="cta add" data-add="p4" data-name="Fuji Ice + Grape Ice + Cherry Pomegranate" data-price="20">Aggiungi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- p5 -->
+    <div class="card" data-product="p5">
+      <a href="product.html?id=p5"><img class="thumb" alt="Blueberry Ice + Raspberry Lemon + Watermelon Bubblegum" src="bluberry1.jpg"></a>
+      <div class="body">
+        <h2 class="title">Blueberry Ice + Raspberry Lemon + Watermelon Bubblegum</h2>
+        <p class="desc">Mirtillo e lampone con limone frizzante, anguria e nota di bubblegum • 💨 110K tiri</p>
+        <div class="rowc">
+          <span class="price">€20</span>
+          <div class="actions">
+            <a class="cta ghost" href="product.html?id=p5">Dettagli</a>
+            <button class="cta add" data-add="p5" data-name="Blueberry Ice + Raspberry Lemon + Watermelon Bubblegum" data-price="20">Aggiungi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- p6 -->
+    <div class="card" data-product="p6">
+      <a href="product.html?id=p6"><img class="thumb" alt="Peach Ice + Blackcurrant Pineapple Ice + Green Apple Kiwi" src="peach1.jpg"></a>
+      <div class="body">
+        <h2 class="title">Peach Ice + Blackcurrant Pineapple Ice + Green Apple Kiwi</h2>
+        <p class="desc">Pesca ghiacciata, ribes nero e ananas, con mela verde e un tocco di kiwi • 💨 110K tiri</p>
+        <div class="rowc">
+          <span class="price">€20</span>
+          <div class="actions">
+            <a class="cta ghost" href="product.html?id=p6">Dettagli</a>
+            <button class="cta add" data-add="p6" data-name="Peach Ice + Blackcurrant Pineapple Ice + Green Apple Kiwi" data-price="20">Aggiungi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- p7 -->
+    <div class="card" data-product="p7">
+      <a href="product.html?id=p7"><img class="thumb" alt="Lemon Romance + Blueberry Raspberry + Peach Menthol" src="lemon1.jpg"></a>
+      <div class="body">
+        <h2 class="title">Lemon Romance + Blueberry Raspberry + Peach Menthol</h2>
+        <p class="desc">Limone frizzante con mirtillo e lampone, rifinito da pesca al mentolo • 💨 110K tiri</p>
+        <div class="rowc">
+          <span class="price">€20</span>
+          <div class="actions">
+            <a class="cta ghost" href="product.html?id=p7">Dettagli</a>
+            <button class="cta add" data-add="p7" data-name="Lemon Romance + Blueberry Raspberry + Peach Menthol" data-price="20">Aggiungi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- p8 -->
+    <div class="card" data-product="p8">
+      <a href="product.html?id=p8"><img class="thumb" alt="Watermelon Ice + Strawberry Mamba + Strawberry Watermelon" src="watermelon1.jpg"></a>
+      <div class="body">
+        <h2 class="title">Watermelon Ice + Strawberry Mamba + Strawberry Watermelon</h2>
+        <p class="desc">Fragola intensa e anguria ghiacciata, con una spinta “Mamba” dolce • 💨 110K tiri</p>
+        <div class="rowc">
+          <span class="price">€20</span>
+          <div class="actions">
+            <a class="cta ghost" href="product.html?id=p8">Dettagli</a>
+            <button class="cta add" data-add="p8" data-name="Watermelon Ice + Strawberry Mamba + Strawberry Watermelon" data-price="20">Aggiungi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- p9 -->
+    <div class="card" data-product="p9">
+      <a href="product.html?id=p9"><img class="thumb" alt="Pineapple Coconut + Blueberry Red Bull + Watermelon Ice" src="pineapplecoconut1.jpg"></a>
+      <div class="body">
+        <h2 class="title">Pineapple Coconut + Blueberry Red Bull + Watermelon Ice</h2>
+        <p class="desc">Ananas e cocco cremoso, con mirtillo “energy” e anguria ghiacciata • 💨 110K tiri</p>
+        <div class="rowc">
+          <span class="price">€20</span>
+          <div class="actions">
+            <a class="cta ghost" href="product.html?id=p9">Dettagli</a>
+            <button class="cta add" data-add="p9" data-name="Pineapple Coconut + Blueberry Red Bull + Watermelon Ice" data-price="20">Aggiungi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<footer>
+  <div style="margin-bottom:8px; line-height:1.5;">
+    📞 +44 7404 401788<br/>
+    📸 Instagram: <a href="https://www.instagram.com/alee.054?igsh=M3Q1dmE3aHMwbnFv&utm_source=qr" target="_blank">@alee.054</a><br/>
+    ✉️ Per info e ordini: scrivimi su WhatsApp
+  </div>
+  © 2025 Selection Puff • Tutti i diritti riservati
+</footer>
+
+<!-- Drawer (non usato qui, lasciato per compatibilità) -->
+<aside class="drawer" id="drawer" aria-label="Carrello" hidden>
+  <div class="dhead"><div class="dtitle">Il tuo carrello</div><button class="dclose" id="closeCart">Chiudi</button></div>
+  <div class="dcontent" id="cartBody"></div>
+  <div class="dfoot"><div class="total"><span>Subtotale</span><span id="cartTotal">€0</span></div><button class="checkout" onclick="checkoutWhatsApp()">Procedi al checkout</button></div>
+</aside>
+
+<!-- Smart image: prova estensioni nell'ordine -->
+<script>
+function setSmartImage(imgEl, basePathNoExt){
+  const exts = ['webp','jpg','jpeg','png'];
+  let i = 0;
+  function tryNext(){
+    if(i >= exts.length) return;
+    const url = basePathNoExt + '.' + exts[i++];
+    const test = new Image();
+    test.onload = function(){ imgEl.src = url; };
+    test.onerror = tryNext;
+    test.src = url;
+  }
+  tryNext();
+}
+</script>
+
+<!-- Set immagini card dalla cartella /site_assets/{pid}/main -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.card').forEach(card => {
+    const link = card.querySelector('a[href*="product.html?id="]');
+    const img = card.querySelector('img.thumb');
+    if(!link || !img) return;
+    const pid = new URLSearchParams(link.href.split('?')[1]).get('id');
+    if(!pid) return;
+    setSmartImage(img, 'site_assets/' + pid + '/main');
+  });
+});
+</script>
+
+<!-- CartSync v3 (unico) -->
+<script>
+(function(){
+  const Cart = window.Cart || (window.Cart = {
+    key: 'selectionpuff.cart.v1',
+    data: [],
+    load(){ try{ this.data = JSON.parse(localStorage.getItem(this.key)) || []; }catch(e){ this.data = []; } return this.data; },
+    save(){ try{ localStorage.setItem(this.key, JSON.stringify(this.data)); }catch(e){} },
+    add(prod, qty=1){
+      this.load();
+      const id = prod && typeof prod === 'object' ? prod.id : String(prod||'');
+      if(!id) return;
+      let ex = this.data.find(x=>x.id===id);
+      if(ex){
+        ex.qty = (Number(ex.qty)||0) + (Number(qty)||1);
+        ex.name = (prod && prod.name) || ex.name;
+        ex.price = (prod && prod.price!=null ? Number(prod.price) : ex.price) || 0;
+        ex.img = (prod && prod.img) || ex.img || '';
+      } else {
+        this.data.push({ id, name:(prod && prod.name)||('Prodotto '+id), price:(prod && Number(prod.price))||0, img:(prod && prod.img)||'', qty:Number(qty)||1 });
+      }
+      this.save();
+    },
+    count(){ this.load(); return this.data.reduce((a,x)=>a+Number(x.qty||0),0); }
+  });
+
+  function deriveProductFromButton(btn){
+    const card = btn.closest('[data-product], .card, .product, .item, .box, article, li') || null;
+
+    // ID
+    let id = (btn.getAttribute('data-add') || btn.dataset.id || btn.dataset.productId || btn.dataset.product || '');
+    if(!id){
+      const link = card && card.querySelector("a[href*='product.html?id=']");
+      if(link){ try{ const u = new URL(link.href, location.href); id = u.searchParams.get('id') || ''; }catch(e){} }
+    }
+
+    // PRIORITÀ: data-* dal bottone
+    let name = (btn.getAttribute('data-name') || '').trim();
+    let priceAttr = btn.getAttribute('data-price');
+    let price = priceAttr!=null ? parseFloat(String(priceAttr).replace(',', '.')) : 0;
+
+    // Fallback dal DOM
+    if(!name){
+      name = (card?.querySelector('[data-name], .title, h3, h4')?.textContent || '').trim() || ('Prodotto ' + (id||''));
+    }
+    if(!price || price<=0){
+      const priceTxt = (card?.querySelector('[data-price], .price')?.textContent || '').trim().replace(',', '.');
+      const m = priceTxt.match(/(\d+(?:\.\d+)?)/g); price = m ? parseFloat(m.at(-1))||20 : 20;
+    }
+
+    // Immagine (NON togliere estensione)
+    let img = '';
+    const imgEl = (card && card.querySelector('img')) || document.querySelector('img');
+    if(imgEl){ img = imgEl.getAttribute('data-src') || imgEl.getAttribute('src') || ''; }
+
+    if(!id && name){ id = name.toLowerCase().replace(/\s+/g,'-').slice(0,40); }
+    return { id, name, price, img };
+  }
+
+  // Delegation per click
+  document.addEventListener('click', function(e){
+    const addBtn = e.target.closest('[data-add], .add, .add-to-cart, button[onclick*="Cart.add"], button[onclick*="addToCart"]');
+    if(addBtn){
+      const p = deriveProductFromButton(addBtn);
+      if(!p || !p.id){ e.preventDefault(); return; }
+      Cart.add(p, 1);
+      const b = document.getElementById('cartCount'); if(b) b.textContent = String(Cart.count());
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      window.location.href='cart.html';
+      return;
+    }
+    const openCartBtn = e.target.closest('[data-open-cart], #cartBtn, .cart-btn, a[href="#cart"]');
+    if(openCartBtn){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      window.location.href='cart.html';
+      return;
+    }
+  }, true);
+
+  function updateBadge(){ const el = document.getElementById('cartCount'); if(el) el.textContent = String(Cart.count()); }
+  document.addEventListener('DOMContentLoaded', updateBadge);
+  window.addEventListener('storage', function(ev){ if(ev.key===Cart.key) updateBadge(); });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Carrello • Selection Puff</title>
+  <style>
+    :root{ --bg:#f5f7fb; --panel:#fff; --ink:#0c1226; --muted:#667085; --brand:#2e6bff; --danger:#e23d3d; --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.07); }
+    *{box-sizing:border-box} html,body{height:100%} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,Segoe UI,Roboto,Arial;display:flex;flex-direction:column;min-height:100vh}
+    header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.7);backdrop-filter:saturate(130%) blur(8px);border-bottom:1px solid rgba(12,18,38,.06)}
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+    .brand .dot{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#56b0ff,#7e88ff)}
+    .cartBtn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:1px solid rgba(12,18,38,.12);background:linear-gradient(90deg,rgba(46,107,255,.08),rgba(126,136,255,.08));cursor:pointer;font-weight:800}
+    .badge{min-width:22px;height:22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;background:linear-gradient(90deg,#2e6bff,#00b7ff);color:#fff}
+
+    main{padding:24px 0 72px}
+    .cart{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+    .panel{background:var(--panel);border-radius:18px;border:1px solid rgba(12,18,38,.08);box-shadow:var(--shadow)}
+    .panel h2{margin:0;padding:16px 18px;border-bottom:1px solid rgba(12,18,38,.08)}
+    .panel .content{padding:16px 18px}
+    .item{display:grid;grid-template-columns:84px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(12,18,38,.1)}
+    .thumb{width:84px;height:84px;border-radius:12px;object-fit:cover;background:#e9efff;border:1px solid rgba(12,18,38,.06)}
+    .name{font-weight:700;margin:0 0 4px}
+    .muted{color:var(--muted);font-size:13px}
+    .qty{display:flex;align-items:center;gap:8px}
+    .qty button{width:28px;height:28px;border-radius:8px;border:1px solid rgba(12,18,38,.12);background:#fff;font-weight:900;cursor:pointer}
+    .danger{color:#fff;background:#e23d3d;border-color:#e23d3d}
+    .footer{display:flex;align-items:center;justify-content:space-between;padding:14px;border-top:1px solid rgba(12,18,38,.08)}
+    .cta{padding:12px 16px;border-radius:12px;border:1px solid rgba(12,18,38,.12);background:linear-gradient(90deg,#2e6bff,#00b7ff);color:#fff;text-decoration:none;font-weight:800;display:inline-flex;gap:8px;align-items:center;justify-content:center;cursor:pointer}
+    .ghost{background:#fff;color:#0c1226;border:1px solid rgba(12,18,38,.12)}
+
+    @media (max-width:900px){ .cart{grid-template-columns:1fr} .item{grid-template-columns:74px 1fr auto} .thumb{width:74px;height:74px} }
+  </style>
+
+<style>
+:root{ --bg:#f5f7fb; --panel:#fff; --ink:#0c1226; --muted:#667085; --brand:#2e6bff; --danger:#e23d3d; --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.07); }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,Segoe UI,Roboto,Arial}
+header.uni-header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.7);backdrop-filter:saturate(130%) blur(8px);border-bottom:1px solid rgba(12,18,38,.06)}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:inline-flex;align-items:center;gap:10px;font-weight:800;color:inherit;text-decoration:none}
+.brand .dot{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#56b0ff,#7e88ff)}
+.cartBtn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:1px solid rgba(12,18,38,.12);background:linear-gradient(90deg,rgba(46,107,255,.08),rgba(126,136,255,.08));cursor:pointer;font-weight:800}
+.badge{min-width:22px;height:22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;background:linear-gradient(90deg,#2e6bff,#00b7ff);color:#fff}
+/* Cards & grid (index) */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid rgba(12,18,38,.08);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.card img{width:100%;height:150px;object-fit:cover;background:#e9efff}
+.card .pad{padding:12px}
+.card .title{font-weight:800;margin:0 0 6px}
+.card .price{color:var(--muted);margin:0 0 12px}
+.add{padding:10px 12px;border-radius:12px;border:1px solid rgba(12,18,38,.12);background:#fff;cursor:pointer;font-weight:800}
+/* PDP */
+.media img{width:100%;max-height:340px;object-fit:cover;border-radius:16px;border:1px solid rgba(12,18,38,.08);box-shadow:var(--shadow)}
+/* Buttons */
+.cta{padding:12px 16px;border-radius:12px;border:1px solid rgba(12,18,38,.12);background:linear-gradient(90deg,#2e6bff,#00b7ff);color:#fff;text-decoration:none;font-weight:800;display:inline-flex;gap:8px;align-items:center;justify-content:center;cursor:pointer}
+.cta.ghost{background:#fff;color:#0c1226;border:1px solid rgba(12,18,38,.12)}
+/* Cart page */
+.cart{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+.panel{background:var(--panel);border-radius:18px;border:1px solid rgba(12,18,38,.08);box-shadow:var(--shadow)}
+.panel h2{margin:0;padding:16px 18px;border-bottom:1px solid rgba(12,18,38,.08)}
+.panel .content{padding:16px 18px}
+.item{display:grid;grid-template-columns:84px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(12,18,38,.1)}
+.thumb{width:84px;height:84px;border-radius:12px;object-fit:cover;background:#e9efff;border:1px solid rgba(12,18,38,.06)}
+.name{font-weight:700;margin:0 0 4px}
+.muted{color:var(--muted);font-size:13px}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:28px;height:28px;border-radius:8px;border:1px solid rgba(12,18,38,.12);background:#fff;font-weight:900;cursor:pointer}
+.footer{display:flex;align-items:center;justify-content:space-between;padding:14px;border-top:1px solid rgba(12,18,38,.08)}
+.footer .left{display:flex;gap:8px;align-items:center}
+.danger{color:#fff;background:#e23d3d;border-color:#e23d3d}
+@media (max-width:900px){ .cart{grid-template-columns:1fr} .item{grid-template-columns:74px 1fr auto} .thumb{width:74px;height:74px} }
+</style>
+
+<style>
+/* --- v6 overrides --- */
+/* 1) Background uniform across page */
+html, body { background: var(--bg) !important; background-image: none !important; }
+main, .page, .page-wrap, .content, .content-area, .container, section { background: transparent !important; }
+
+/* 2) Card actions row (Dettagli + Aggiungi) side-by-side */
+.card .actions { display:flex; gap:10px; align-items:center; margin-top:8px; }
+.card .actions .cta, .card .actions .add { flex:0 0 auto; }
+
+/* 3) If markup doesn't have .actions, place buttons inline anyway */
+.card .pad .cta, .card .pad .add { display:inline-flex; vertical-align:middle; margin-right:8px; }
+
+/* 4) Product media: bigger, clean crop */
+.media { border-radius:16px; overflow:hidden; }
+.media img { width:100%; max-height:360px; height:360px; object-fit:cover; display:block; }
+
+/* 5) Buttons spacing (cart footer tidy) */
+.footer .left .cta { margin-right:8px; }
+
+/* 6) Make "Dettagli" (likely an <a>) visually consistent with buttons if not already */
+a.cta { display:inline-flex; }
+</style>
+</head>
+<body>
+<header class="uni-header">
+  <div class="wrap row">
+    <a class="brand" href="index.html"><span class="dot"></span> Selection Puff</a>
+    <button class="cartBtn" id="cartBtn"><span>Carrello</span> <span class="badge" id="cartCount">0</span></button>
+  </div>
+</header>
+
+  
+
+  <main class="wrap">
+    <div class="cart">
+      <section class="panel">
+        <h2>Il tuo carrello</h2>
+        <div class="content" id="cartBody"></div>
+      </section>
+
+      <aside class="panel">
+        <h2>Riepilogo</h2>
+        <div class="content">
+          <div class="row"><span class="muted">Subtotale</span> <strong id="subtotal">€0</strong></div>
+          <p class="muted">Ritiro in zona Segrate.</p>
+        </div>
+        <div class="footer">
+  <div class="left">
+    <a class="cta ghost" id="backToShop" href="index.html">Torna alla vetrina</a>
+    <button class="cta ghost danger" id="clearBtn">Svuota</button>
+  </div>
+  <button class="cta" id="checkoutBtn">Checkout WhatsApp</button>
+</div>
+</aside>
+    </div>
+  </main>
+
+  <script>
+  const Cart = window.Cart || (window.Cart = {
+    key: 'selectionpuff.cart.v1',
+    data: [],
+    load(){ try{ this.data = JSON.parse(localStorage.getItem(this.key)) || []; }catch(e){ this.data = []; } return this.data; },
+    save(){ localStorage.setItem(this.key, JSON.stringify(this.data)); },
+    total(){ return this.data.reduce((a,i)=>a + (Number(i.qty)||0)*(Number(i.price)||0), 0); },
+    setQty(id, qty){ const it = this.data.find(x=>x.id===id); if(!it) return; it.qty = Math.max(1, Number(qty)||1); this.save(); render(); },
+    remove(id){ this.data = this.data.filter(x=>x.id!==id); this.save(); render(); },
+    clear(){ this.data=[]; this.save(); render(); },
+  });
+
+  function euro(x){ return '€' + (Number(x)||0).toFixed(2).replace('.', ','); }
+
+  function setSmartImage(imgEl, base){
+    const exts = ['.webp','.jpg','.jpeg','.png'];
+    (function tryNext(i){
+      if(i>=exts.length){ imgEl.src=''; return;}
+      const src = base.match(/\.(webp|png|jpe?g)$/i) ? base : (base + exts[i]);
+      const test = new Image();
+      test.onload = ()=>{ imgEl.src = src; };
+      test.onerror = ()=> tryNext(i+1);
+      test.src = src;
+    })(0);
+  }
+
+  function render(){
+    Cart.load();
+    const body = document.getElementById('cartBody');
+    const sub = document.getElementById('subtotal');
+    body.innerHTML = '';
+    if(!Cart.data.length){
+      body.innerHTML = '<p class="muted">Il carrello è vuoto.</p>';
+    } else {
+      Cart.data.forEach(it => {
+        const row = document.createElement('div');
+        row.className = 'item';
+        row.innerHTML = `
+          <img class="thumb" alt="" />
+          <div>
+            <p class="name">${it.name||it.id}</p>
+            <p class="muted">${euro(it.price)} • <a href="#" data-del="${it.id}">Rimuovi</a></p>
+          </div>
+          <div class="qty">
+            <button data-dec="${it.id}">-</button>
+            <strong>${it.qty}</strong>
+            <button data-inc="${it.id}">+</button>
+          </div>`;
+        const img = row.querySelector('img');
+        setSmartImage(img, (it.img||''));
+        body.appendChild(row);
+      });
+    }
+    sub.textContent = euro(Cart.total());
+    const badge = document.getElementById('cartCount'); if(badge) badge.textContent = String(Cart.data.reduce((a,x)=>a+Number(x.qty||0),0));
+  }
+
+  document.addEventListener('click', (e)=>{
+    const inc = e.target.closest('[data-inc]'); if(inc){ Cart.setQty(inc.getAttribute('data-inc'), (Cart.data.find(x=>x.id===inc.getAttribute('data-inc')).qty||1)+1); e.preventDefault(); return; }
+    const dec = e.target.closest('[data-dec]'); if(dec){ const id=dec.getAttribute('data-dec'); const it = Cart.data.find(x=>x.id===id); const q = Math.max(1,(it?.qty||1)-1); Cart.setQty(id, q); e.preventDefault(); return; }
+    const del = e.target.closest('[data-del]'); if(del){ Cart.remove(del.getAttribute('data-del')); e.preventDefault(); return; }
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', ()=>{ if(confirm('Svuotare il carrello?')) Cart.clear(); });
+
+  const WHATSAPP_NUMBER = '447404401788';
+  function composeWhatsappMessage(){
+    const lines = ['🛒 *Ordine Selection Puff*',''];
+    Cart.data.forEach(it => lines.push(`• ${it.qty}× *${it.name||it.id}* — ${euro((Number(it.qty)||0)*(Number(it.price)||0))}`));
+    lines.push('', `💶 *Totale:* ${euro(Cart.total())}`, '', '📍 *Meet-up:* zona Segrate');
+    return lines.join('\n');
+  }
+  document.getElementById('checkoutBtn').addEventListener('click', ()=>{
+    if(!Cart.data.length){ alert('Il carrello è vuoto.'); return; }
+    const url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(composeWhatsappMessage());
+    window.open(url, '_blank');
+  });
+
+  render();
+  window.addEventListener('storage', (e)=>{ if(e.key===Cart.key) render(); });
+  </script>
+</body>
+</html>

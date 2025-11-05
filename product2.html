@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html lang="it">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Selection Puff – Dettaglio</title>
+<style>
+    :root{
+      --bg:#f6f8ff; --bg-2:#eaf0ff; --card:#ffffff; --surface:#eef3ff;
+      --muted:#4a5a7a; --text:#0b1220; --accent:#0066ff; --accent-2:#00b7ff;
+      --edge: rgba(8,14,30,.12); --radius:16px; --shadow: 0 10px 30px rgba(10, 20, 60, .08);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:
+      radial-gradient(800px 400px at 10% -10%,rgba(0,183,255,.15),transparent 50%),
+      radial-gradient(900px 450px at 90% -10%,rgba(0,102,255,.12),transparent 50%),
+      linear-gradient(180deg,var(--bg),var(--bg-2));
+      color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;min-height:100%}
+    a{color:inherit;text-decoration:none}
+    @keyframes floatIn{from{transform:translateY(8px);opacity:.0}to{transform:translateY(0);opacity:1}}
+    @keyframes pulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
+
+    /* HEADER */
+    header{position:sticky;top:0;backdrop-filter:saturate(1.2) blur(12px);
+      background:rgba(255,255,255,.7);border-bottom:1px solid var(--edge);z-index:20}
+    .wrap{max-width:1180px;margin:0 auto;padding:16px}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:42px;height:42px;border-radius:12px;
+      background:conic-gradient(from 120deg at 50% 50%,var(--accent),var(--accent-2),var(--accent));
+      box-shadow:0 6px 18px rgba(0,102,255,.25);animation:pulse 4s ease-in-out infinite}
+    h1{font-size:22px;margin:0}
+    .sub{color:var(--muted);font-size:13px}
+    .cartBtn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:1px solid var(--edge);
+      background:linear-gradient(90deg,rgba(0,102,255,.08),rgba(0,183,255,.10));cursor:pointer;transition:transform .15s ease, box-shadow .2s ease;font-weight:800}
+    .cartBtn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+    .badge{min-width:22px;height:22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;
+      font-weight:900;font-size:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff}
+
+    /* PAGE */
+    main{padding:24px 0 72px}
+    .card{display:grid;grid-template-columns:1fr 1.05fr;gap:20px;background:var(--card);border:1px solid var(--edge);
+      border-radius:18px;padding:18px;box-shadow:var(--shadow);animation:floatIn .35s ease both}
+    .media img{width:100%;display:block;aspect-ratio: 9/7;object-fit:cover;background:#e5ecff;border-radius:14px}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .chip{font-size:12px;padding:8px 12px;border:1px solid var(--edge);border-radius:999px;background:#eef3ff;cursor:pointer}
+    .flavor{font-size:18px;font-weight:800;margin:6px 0 10px;color:#4a5a7a}
+    .desc{color:var(--muted);line-height:1.5}
+    .actions{display:flex;gap:10px;margin-top:14px}
+    .cta{font-weight:800;padding:10px 12px;border-radius:12px;border:1px solid var(--edge);cursor:pointer}
+    .add{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0}
+    .ghost{background:transparent}
+
+    /* FOOTER + CART */
+    footer{color:var(--muted);text-align:center;padding:24px;border-top:1px solid var(--edge);margin-top:24px;background:#fff8}
+    .backdrop{position:fixed;inset:0;background:rgba(10,20,40,.25);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .2s ease}
+    .drawer{position:fixed;top:0;right:-460px;width:460px;max-width:92vw;height:100vh;background:#fff;border-left:1px solid var(--edge);
+      z-index:30;display:flex;flex-direction:column;transition: right .25s ease;box-shadow:-12px 0 30px rgba(10,20,60,.12);color:var(--text)}
+    .drawer.open{right:0}
+    .backdrop.show{opacity:1;pointer-events:auto}
+    .dhead{padding:16px;border-bottom:1px solid var(--edge);display:flex;justify-content:space-between;align-items:center;background:var(--surface)}
+    .dtitle{font-weight:900;font-size:18px}
+    .dclose{background:transparent;border:1px solid var(--edge);border-radius:10px;color:var(--text);padding:8px 12px;cursor:pointer}
+    .dcontent{padding:14px;overflow:auto;flex:1}
+    .dfoot{padding:14px;border-top:1px solid var(--edge);background:var(--surface)}
+    .line{display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;border:1px solid var(--edge);border-radius:12px;padding:10px;margin-bottom:12px;background:#f9fbff}
+    .line img{width:72px;height:56px;object-fit:cover;border-radius:10px;background:#e5ecff}
+    .qty{display:inline-flex;border:1px solid var(--edge);border-radius:12px;overflow:hidden}
+    .qty button{background:transparent;border:0;color:var(--text);width:30px;height:32px;cursor:pointer;font-size:18px}
+    .qty input{width:50px;text-align:center;background:transparent;border:0;color:var(--text);font-weight:900}
+
+    @media (max-width:900px){ .card{grid-template-columns:1fr} }
+  </style>
+<style>
+:root{ --bg:#f5f7fb; --panel:#fff; --ink:#0c1226; --muted:#667085; --brand:#2e6bff; --danger:#e23d3d; --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.07); }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,Segoe UI,Roboto,Arial}
+header.uni-header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.7);backdrop-filter:saturate(130%) blur(8px);border-bottom:1px solid rgba(12,18,38,.06)}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:inline-flex;align-items:center;gap:10px;font-weight:800;color:inherit;text-decoration:none}
+.brand .dot{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#56b0ff,#7e88ff)}
+.cartBtn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:1px solid rgba(12,18,38,.12);background:linear-gradient(90deg,rgba(46,107,255,.08),rgba(126,136,255,.08));cursor:pointer;font-weight:800}
+.badge{min-width:22px;height:22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;background:linear-gradient(90deg,#2e6bff,#00b7ff);color:#fff}
+/* Cards & grid (index) */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid rgba(12,18,38,.08);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.card img{width:100%;height:150px;object-fit:cover;background:#e9efff}
+.card .pad{padding:12px}
+.card .title{font-weight:800;margin:0 0 6px}
+.card .price{color:var(--muted);margin:0 0 12px}
+.add{padding:10px 12px;border-radius:12px;border:1px solid rgba(12,18,38,.12);background:#fff;cursor:pointer;font-weight:800}
+/* PDP */
+.media img{width:100%;max-height:340px;object-fit:cover;border-radius:16px;border:1px solid rgba(12,18,38,.08);box-shadow:var(--shadow)}
+/* Buttons */
+.cta{padding:12px 16px;border-radius:12px;border:1px solid rgba(12,18,38,.12);background:linear-gradient(90deg,#2e6bff,#00b7ff);color:#fff;text-decoration:none;font-weight:800;display:inline-flex;gap:8px;align-items:center;justify-content:center;cursor:pointer}
+.cta.ghost{background:#fff;color:#0c1226;border:1px solid rgba(12,18,38,.12)}
+/* Cart page */
+.cart{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+.panel{background:var(--panel);border-radius:18px;border:1px solid rgba(12,18,38,.08);box-shadow:var(--shadow)}
+.panel h2{margin:0;padding:16px 18px;border-bottom:1px solid rgba(12,18,38,.08)}
+.panel .content{padding:16px 18px}
+.item{display:grid;grid-template-columns:84px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(12,18,38,.1)}
+.thumb{width:84px;height:84px;border-radius:12px;object-fit:cover;background:#e9efff;border:1px solid rgba(12,18,38,.06)}
+.name{font-weight:700;margin:0 0 4px}
+.muted{color:var(--muted);font-size:13px}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:28px;height:28px;border-radius:8px;border:1px solid rgba(12,18,38,.12);background:#fff;font-weight:900;cursor:pointer}
+.footer{display:flex;align-items:center;justify-content:space-between;padding:14px;border-top:1px solid rgba(12,18,38,.08)}
+.footer .left{display:flex;gap:8px;align-items:center}
+.danger{color:#fff;background:#e23d3d;border-color:#e23d3d}
+@media (max-width:900px){ .cart{grid-template-columns:1fr} .item{grid-template-columns:74px 1fr auto} .thumb{width:74px;height:74px} }
+</style>
+</head>
+<body>
+<header class="uni-header">
+<div class="wrap row">
+<a class="brand" href="index.html"><span class="dot"></span> Selection Puff</a>
+<button class="cartBtn" id="cartBtn"><span>Carrello</span> <span class="badge" id="cartCount">0</span></button>
+</div>
+</header>
+<!-- HEADER -->
+<main class="wrap">
+<!-- Breadcrumb -->
+<div style="font-size:13px;color:var(--muted);margin:6px 0 12px;">
+<a href="index.html">Home</a> → <span>Prodotto</span>
+</div>
+<div class="card">
+<div class="media"><img alt="Foto prodotto" id="mainImg"/></div>
+<div>
+<h2 id="title" style="margin:0">PUFF 110K</h2>
+<p class="flavor" id="flavor"></p>
+<p class="desc" id="desc">Seleziona le foto qui sotto per cambiare immagine.</p>
+<div class="chips" id="gallery"></div>
+<div class="actions">
+<button class="cta add" id="addToCartBtn">Aggiungi al carrello</button>
+<a class="cta ghost" href="index.html">← Torna alla vetrina</a>
+</div>
+</div>
+</div>
+</main>
+<!-- FOOTER + CART -->
+<footer>
+<div style="margin-bottom:8px; line-height:1.5;">
+      📞 +44 7404 401788<br/>
+      📸 Instagram: <a href="https://www.instagram.com/alee.054?igsh=M3Q1dmE3aHMwbnFv&amp;utm_source=qr" target="_blank">@alee.054</a><br/>
+      ✉️ Per info e ordini: scrivimi su WhatsApp
+    </div>
+    © 2025 Selection Puff • Tutti i diritti riservati
+  </footer>
+<aside aria-label="Carrello" class="drawer" id="drawer">
+<div class="dhead">
+<div class="dtitle">Il tuo carrello</div>
+<button class="dclose" id="closeCart">Chiudi</button>
+</div>
+<div class="dcontent" id="cartBody"></div>
+<div class="dfoot">
+<div class="total"><span>Subtotale</span><span id="cartTotal">€0</span></div>
+<button class="checkout" id="checkoutBtn">Procedi al checkout</button>
+</div>
+</aside>
+<!-- Utility: smart image fallback -->
+<script>
+    function setSmartImage(imgEl, basePathNoExt){
+      const exts = ['webp','jpg','jpeg','png'];
+      let i = 0;
+      function tryNext(){
+        if(i >= exts.length){ return; }
+        const url = basePathNoExt + '.' + exts[i++];
+        const test = new Image();
+        test.onload = function(){ imgEl.src = url; };
+        test.onerror = tryNext;
+        test.src = url;
+      }
+      tryNext();
+    }
+  </script>
+<!-- Cart + Data (CLEAN VERSION) -->
+<!-- Product page logic -->
+<script>
+    (function(){
+      const PRODUCTS_META = {
+        p1:{name:'Grape Ice + Mango Peach + Blueberry Watermelon'},
+        p2:{name:'Strawberry Ice + Peach Lemon + Kiwi Passion Fruit Guava'},
+        p3:{name:'Strawberry Kiwi + Blueberry Coconut + Mixed Berry'},
+        p4:{name:'Fuji Ice + Grape Ice + Cherry Pomegranate'},
+        p5:{name:'Blueberry Ice + Raspberry Lemon + Watermelon Bubblegum'},
+        p6:{name:'Peach Ice + Blackcurrant Pineapple Ice + Green Apple Kiwi'},
+        p7:{name:'Lemon Romance + Blueberry Raspberry + Peach Menthol'},
+        p8:{name:'Watermelon Ice + Strawberry Mamba + Strawberry Watermelon'},
+        p9:{name:'Pineapple Coconut + Blueberry Red Bull + Watermelon Ice'}
+      };
+      const GALLERY_BY_ID = {
+        p1:['grapeice1','grapeice2','grapeice3'],
+        p2:['strawberry1','strawberry2','strawberry3'],
+        p3:['blueberrycoconut1','blueberrycoconut2','blueberrycoconut3'],
+        p4:['fujii1','fujii2','fujii3'],
+        p5:['bluberry1','bluberry2','bluberry3'],
+        p6:['peach1','peach2','peach3'],
+        p7:['lemon1','lemon2','lemon3'],
+        p8:['watermelon1','watermelon2','watermelon3'],
+        p9:['pineapplecoconut1','pineapplecoconut2','pineapplecoconut3']
+      };
+
+      function getId(){ return new URLSearchParams(location.search).get('id') || 'p1'; }
+
+      function generateDescription(flavor){
+        const cold = /ice|menthol|ghiacciat/i.test(flavor);
+        const tropical = /mango|pineapple|kiwi|coconut|guava|peach|passion/i.test(flavor);
+        const berries = /blueberry|strawberry|raspberry|berry|cherry|pomegranate/i.test(flavor);
+        const citrus = /lemon/i.test(flavor);
+
+        const bits = [];
+        bits.push('PUFF 110K – ' + flavor + '.');
+        if (cold && tropical){
+          bits.push('Mix esotico e ghiacciato: freschezza cristallina con dolcezza tropicale.');
+        } else if (cold && berries){
+          bits.push('Frutti di bosco con finitura glaciale: pulita, intensa, super rinfrescante.');
+        } else if (tropical){
+          bits.push('Anima tropicale: dolce, succosa e avvolgente, perfetta tutto il giorno.');
+        } else if (berries){
+          bits.push('Ricco profilo fruttato: rotondo e piacevole, con persistenza lunga.');
+        } else {
+          bits.push('Gusto bilanciato e moderno, ideale per sessioni prolungate.');
+        }
+        if (citrus) bits.push('Nota agrumata brillante che dona vivacità al tiro.');
+
+        bits.push('🔀 I tre blend contengono fino a 6 gusti totali: puoi combinarli a due a due per creare profili personalizzati (fino a 6 combinazioni).');
+        bits.push('💨 Fino a 110K tiri.');
+
+        return bits.join(' ');
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const id = getId();
+        const meta = PRODUCTS_META[id];
+
+        const main = document.getElementById('mainImg');
+        const gal = document.getElementById('gallery');
+        const addBtn = document.getElementById('addToCartBtn');
+
+        // Immagine principale
+        if(GALLERY_BY_ID[id]){ setSmartImage(main, 'site_assets/'+id+'/'+GALLERY_BY_ID[id][0]); }
+        else { setSmartImage(main, 'site_assets/'+id+'/main'); }
+
+        // Gallery
+        if(GALLERY_BY_ID[id]){
+          GALLERY_BY_ID[id].forEach((name,idx) => {
+            const a = document.createElement('a');
+            a.href = 'javascript:void(0)'; a.className = 'chip';
+            a.textContent = 'Foto ' + (idx+1);
+            a.addEventListener('click', () => setSmartImage(main, 'site_assets/'+id+'/'+name));
+            gal.appendChild(a);
+          });
+        }
+
+        // Titolo + Sottotitolo + Descrizione
+        document.getElementById('flavor').textContent = meta ? meta.name : 'Dettaglio prodotto';
+        const descEl = document.getElementById('desc');
+        descEl.textContent = generateDescription(meta ? meta.name : '');
+
+        // SEO + alt
+        document.title = 'Selection Puff – ' + (meta ? meta.name : 'Dettaglio') + ' | Dettaglio';
+        main.alt = 'PUFF 110K – ' + (meta ? meta.name : 'Dettaglio');
+
+        // Aggiungi al carrello
+        addBtn.addEventListener('click', () => Cart.add(id, 1));
+      });
+    })();
+  </script>
+<!-- CartSync v1 -->
+<script>
+(function(){
+  const Cart = window.Cart || (window.Cart = {
+    key:'selectionpuff.cart.v1',
+    data:[],
+    load(){ try{ this.data = JSON.parse(localStorage.getItem(this.key)) || []; }catch(e){ this.data = []; } return this.data; },
+    save(){ localStorage.setItem(this.key, JSON.stringify(this.data)); },
+    add(prod, qty=1){
+      this.load();
+      const id = prod.id;
+      let ex = this.data.find(x=>x.id===id);
+      if(ex){ ex.qty = Number(ex.qty||0) + Number(qty||1); ex.name = ex.name || prod.name; ex.price = ex.price || prod.price; ex.img = ex.img || prod.img; }
+      else { this.data.push({id: id, name: prod.name||('Prodotto '+id), price: Number(prod.price)||0, img: prod.img||'', qty: Number(qty||1)}); }
+      this.save();
+    },
+    count(){ this.load(); return this.data.reduce((a,x)=>a+Number(x.qty||0),0); }
+  });
+
+  function getText(el){ return (el && el.textContent||'').trim(); }
+  function parsePrice(txt){
+    txt = (txt||'').replace(',', '.');
+    const m = txt.match(/(\d+(?:\.\d+)?)/g);
+    if(!m) return 0;
+    return parseFloat(m[m.length-1])||0;
+  }
+  function deriveProduct(btn){
+    const idAttr = btn.getAttribute('data-add') || btn.dataset.id || btn.dataset.productId || btn.dataset.product || '';
+    const id = idAttr || '';
+    let base = (window.PRODUCTS && id && window.PRODUCTS[id]) ? window.PRODUCTS[id] : null;
+    if(base) return base;
+    const card = btn.closest('[data-product], .card, .product, .item, .box, article, li') || document;
+    let name = getText(card.querySelector('[data-name]')) || getText(card.querySelector('h3')) || getText(card.querySelector('h4')) || getText(card.querySelector('.title')) || ('Prodotto '+(id||''));
+    let price = parsePrice(getText(card.querySelector('[data-price]')) || getText(card.querySelector('.price')));
+    let imgEl = card.querySelector('img');
+    let img = imgEl ? (imgEl.getAttribute('data-src') || imgEl.getAttribute('src') || '') : '';
+    img = img.replace(/\.(webp|png|jpe?g)$/i,''); // store base path; cart.html resolves extension
+    return {id: id || name.toLowerCase().replace(/\s+/g,'-').slice(0,40), name, price, img};
+  }
+
+  // Delegation for clicks
+  document.addEventListener('click', function(e){
+    const addBtn = e.target.closest('[data-add]');
+    if(addBtn){
+      const p = deriveProduct(addBtn);
+      if(!p || !p.id){ alert('Prodotto non valido'); e.preventDefault(); return; }
+      Cart.add(p, 1);
+      const badge = document.getElementById('cartCount'); if(badge) badge.textContent = String(Cart.count());
+      e.preventDefault(); window.location.href='cart.html'; return;
+    }
+    const cartBtn = e.target.closest('[data-open-cart], #cartBtn, .cart-btn, a[href="#cart"]');
+    if(cartBtn){ e.preventDefault(); window.location.href='cart.html'; return; }
+  }, true);
+
+  function updateBadge(){ const el = document.getElementById('cartCount'); if(el) el.textContent = String(Cart.count()); }
+  document.addEventListener('DOMContentLoaded', updateBadge);
+  window.addEventListener('storage', function(ev){ if(ev.key===Cart.key) updateBadge(); });
+})();
+</script>
+<!-- /CartSync v1 -->
+<!-- CartSync v3 -->
+<script>
+(function(){
+  const Cart = window.Cart || (window.Cart = {
+    key: 'selectionpuff.cart.v1',
+    data: [],
+    load(){ try{ this.data = JSON.parse(localStorage.getItem(this.key)) || []; }catch(e){ this.data = []; } return this.data; },
+    save(){ localStorage.setItem(this.key, JSON.stringify(this.data)); },
+    add(prod, qty=1){
+      this.load();
+      const id = prod.id;
+      let ex = this.data.find(x=>x.id===id);
+      if(ex){
+        ex.qty = (Number(ex.qty)||0) + (Number(qty)||1);
+        ex.name = prod.name || ex.name;
+        ex.price = (prod.price!=null? Number(prod.price): ex.price)||0;
+        ex.img = prod.img || ex.img || '';
+      } else {
+        this.data.push({id, name: prod.name||('Prodotto '+id), price: Number(prod.price)||0, img: prod.img||'', qty: Number(qty)||1});
+      }
+      this.save();
+    },
+    count(){ this.load(); return this.data.reduce((a,x)=>a+Number(x.qty||0),0); }
+  });
+
+  function getText(el){ return (el && el.textContent||'').trim(); }
+  function parsePrice(txt){ txt = (txt||'').replace(',', '.'); const m = txt.match(/(\d+(?:\.\d+)?)/g); return m ? parseFloat(m[m.length-1])||0 : 0; }
+  function guessIdFromUrl(){ try{ const u = new URL(location.href); return u.searchParams.get('id')||''; }catch(e){ return ''; } }
+
+  function deriveProductFromButton(btn){
+    const card = btn.closest('[data-product], .card, .product, .item, .box, article, li') || document;
+    let id = btn.getAttribute('data-add') || btn.dataset.id || btn.dataset.productId || btn.dataset.product || guessIdFromUrl() || '';
+    let name = getText(card.querySelector('[data-name]')) || getText(card.querySelector('.title')) || getText(document.querySelector('h1,h2')) || ('Prodotto '+(id||''));
+    let price = parsePrice(getText(card.querySelector('[data-price]')) || getText(card.querySelector('.price')) || getText(document.querySelector('.price')));
+    const imgEl = card.querySelector('img') || document.querySelector('.media img') || document.querySelector('img');
+    let img = imgEl ? (imgEl.getAttribute('data-src') || imgEl.getAttribute('src') || '') : '';
+    img = img.replace(/\.(webp|png|jpe?g)$/i,''); // store base path
+    if(!id) id = name.toLowerCase().replace(/\s+/g,'-').slice(0,40);
+    return { id, name, price, img };
+  }
+
+  document.addEventListener('click', function(e){
+    const addBtn = e.target.closest('[data-add], .add, .add-to-cart, button[onclick*="Cart.add"], button[onclick*="addToCart"]');
+    if(addBtn){ const p = deriveProductFromButton(addBtn); Cart.add(p, 1); const b = document.getElementById('cartCount'); if(b) b.textContent=String(Cart.count()); e.preventDefault(); e.stopImmediatePropagation(); window.location.href='cart.html'; return; }
+    const openCartBtn = e.target.closest('[data-open-cart], #openCart, #cartBtn, .cartBtn, .cart-btn, a[href="#cart"]');
+    if(openCartBtn){ e.preventDefault(); e.stopImmediatePropagation(); window.location.href='cart.html'; return; }
+  }, true);
+
+  function updateBadge(){ const el = document.getElementById('cartCount'); if(el) el.textContent = String(Cart.count()); }
+  document.addEventListener('DOMContentLoaded', updateBadge);
+  window.addEventListener('storage', function(ev){ if(ev.key===Cart.key) updateBadge(); });
+})();
+</script>
+
+<script>
+    const productId = 'p1';  // Dovrebbe essere dinamico per ogni prodotto
+    const productGusto = PRODUCTS_META[productId]?.name || 'Gusto non disponibile';  // Ottieni il nome del gusto
+
+    const addBtn = document.querySelector('.add-to-cart');
+
+    addBtn.setAttribute('data-name', productGusto);
+    addBtn.setAttribute('data-price', '20');  // Sostituire con il prezzo effettivo
+    addBtn.setAttribute('data-add', productId);  // ID del prodotto
+
+    addBtn.addEventListener('click', () => {
+        const name = addBtn.getAttribute('data-name');
+        const price = addBtn.getAttribute('data-price');
+        const productId = addBtn.getAttribute('data-add');
+
+        // Aggiungi il prodotto al carrello con il gusto corretto
+        Cart.add({ id: productId, name: name, price: price }, 1);
+    });
+</script>
+</body>
+</html>
